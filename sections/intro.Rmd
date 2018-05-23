@@ -1,0 +1,179 @@
+class: center, middle, inverse
+
+# `r icon::fa("box-open", size = 1)` Introduction
+
+---
+
+class: venn
+
+# Electoral data in Brazil
+
+- As in any other country, it is a valuable information for politicians
+- Public interest
+- Data available at [Superior Electoral Court ](http://www.tse.jus.br/)
+--
+
+- Aggregation levels: Country, State, City, Electoral Zone, Electoral Session
+
+![](img/venn.svg)
+
+- How can we visualize and analyze this data in a intramunicipality level?
+--
+
+    - In great cities we have the electoral zones well defined
+    - Small cities share electoral zones
+
+--
+
+This makes electoral zones a bad choice for this problem. A solution would be
+work with electoral sections. 
+
+---
+
+# Electoral sections
+
+.middle[
+
+- There is no official administrative divisions for the electoral sections, we
+only have access to the addresses of this sections  
+
+- This lead us to some problems:  
+
+]
+
+---
+
+class: center, middle
+
+## 1 - Can be difficult for those who are not familiarized with _geostatistics_ to interpret the data
+
+---
+
+class: center, middle
+
+```{r sp_sec_points}
+data("regMun")
+
+regMun %<>%
+  st_as_sf() %>%
+  st_transform(crs = 3857) %>%
+  filter(UF == 'SP', NOME == 'São Paulo')
+
+sp_cap <- regMun
+
+load('../data/output_data/ibge_sp.RData')
+
+load('../data/output_data/votos_t1_sp.RData')
+
+# Visualizacao
+
+ggplot(votos_t1) +
+  geom_sf(data = sp_cap,
+          size = .2, 
+          color = 'black', fill = 'black') +
+  geom_sf(aes(color = PSDB), shape = 19, alpha = .6, size = 1.2) +
+  scale_color_gradient2(low = 'red', mid = 'white', 
+                        high = 'blue',
+                        midpoint = .5, 
+                        labels = scales::percent, breaks = c(0, .5, .99),
+                        guide = guide_colorbar(ticks = F, 
+                                               title = '% votes - PSDB')) +
+  theme_bw() +
+  theme(axis.text = element_blank())
+
+```
+
+---
+
+class: center, middle
+
+## 2 - Aggregation of census data is not straightforward
+
+---
+
+class: center, middle
+
+```{r sp_join}
+data2 <- data
+
+data2 %<>% mutate(information = 'Census') %>% 
+  select(cod_setor, information) %>% rename('ID' = 'cod_setor')
+
+votos2 <- votos_t1 %>% mutate(information = 'Elections') %>% 
+  select(ID, information)
+
+data2 <- rbind(data2, votos2)
+
+ggplot(data2) +
+    geom_sf(data = sp_cap, fill = 'transparent', size = .2,
+          color = 'black') +
+  geom_sf(aes(size = information, 
+              fill = information),
+          color = 'black', 
+          fill = 'transparent',
+          alpha = .8) +
+  scale_size_manual(values = c(.2, 1.2)) +
+  scale_fill_manual(values = c('#adb3bc', 'black')) +
+  # scale_fill_gradient(low = '#ffffff', high = '#ff0000', labels = label_pop,
+  #                     guide = guide_colorbar(ticks = F, title = 'Population',
+  #                                            title.position = 'bottom',
+  #                                            label = F)) +
+  # geom_sf(data = votos_lat_long, shape = 19, color = 'red') +
+  facet_wrap(~information) +
+  theme_bw() +
+  guides(fill = F, size = F) +
+  theme(strip.background = element_rect(fill = 'transparent'),
+        axis.text = element_blank())
+
+rm(data2, votos2)
+```
+
+---
+
+class: center, middle
+
+```{r sp_wasted}
+data$intersects <- st_intersects(data, votos_t1, sparse = F) %>% apply(1, any)
+
+percent <- tapply(data$pop, data$intersects, sum, na.rm = T) %>% 
+  (function(x) {
+    x/sum(x)
+  }) %>% scales::percent()
+
+data %<>% 
+  mutate(intersects = case_when(
+    intersects == TRUE ~ paste0('Information considered', ' ',
+                                '(', percent[2], ')'),
+    intersects == FALSE ~ paste0('Information wasted', ' ',
+                                 '(', percent[1], ')'))
+  )
+
+# Visualizacao
+
+label_pop <- function(x, ...) {
+  formatC(x, big.mark = '.', decimal.mark = ',' ,...)
+}
+
+ggplot(data) +
+  geom_sf(data = sp_cap,
+          size = .2,
+          color = 'black', fill = 'transparent') +
+  geom_sf(aes(fill = pop), size = .1, color = 'black', alpha = .9) +
+  scale_fill_gradient(low = '#ffffff', high = '#ff0000', labels = label_pop,
+                      guide = guide_colorbar(ticks = F, title = 'Population',
+                                             title.position = 'bottom',
+                                             label = F)) +
+  # geom_sf(data = votos_lat_long, shape = 19, color = 'red') +
+  facet_wrap(~intersects) +
+  theme_bw() +
+  theme(strip.background = element_rect(fill = 'transparent'),
+        legend.direction = 'horizontal',
+        legend.position = 'bottom', 
+        axis.text = element_blank())
+
+rm(data, votos_t1)
+```
+
+---
+
+

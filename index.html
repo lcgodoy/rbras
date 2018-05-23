@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Voronoi Cells</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Lucas da Cunha Godoy  Augusto Felix Marcolin  Douglas R. Mesquita Azevedo  Luis Gustavo Silva e Silva" />
+    <link href="libs/font-awesome/css/fontawesome-all.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="custom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Voronoi Cells
+## Visualizing intramunicipality votes distribution
+### Lucas da Cunha Godoy </br> Augusto Felix Marcolin </br> Douglas R. Mesquita Azevedo </br> Luis Gustavo Silva e Silva </br>
+### May, 2018 </br> RBRAS - Curitiba, PR - Brasil
+
+---
+
+
+
+
+
+class: center, middle, inverse
+
+# <i class="fas  fa-box-open "></i> Introduction
+
+---
+
+class: venn
+
+# Electoral data in Brazil
+
+- As in any other country, it is a valuable information for politicians
+- Public interest
+- Data available at [Superior Electoral Court ](http://www.tse.jus.br/)
+--
+
+- Aggregation levels: Country, State, City, Electoral Zone, Electoral Session
+
+![](img/venn.svg)
+
+- How can we visualize and analyze this data in a intramunicipality level?
+--
+
+    - In great cities we have the electoral zones well defined
+    - Small cities share electoral zones
+
+--
+
+This makes electoral zones a bad choice for this problem. A solution would be
+work with electoral sections. 
+
+---
+
+# Electoral sections
+
+.middle[
+
+- There is no official administrative divisions for the electoral sections, we
+only have access to the addresses of this sections  
+
+- This lead us to some problems:  
+
+]
+
+---
+
+class: center, middle
+
+## 1 - Can be difficult for those who are not familiarized with _geostatistics_ to interpret the data
+
+---
+
+class: center, middle
+
+![](index_files/figure-html/sp_sec_points-1.svg)&lt;!-- --&gt;
+
+---
+
+class: center, middle
+
+## 2 - Aggregation of census data is not straightforward
+
+---
+
+class: center, middle
+
+![](index_files/figure-html/sp_join-1.svg)&lt;!-- --&gt;
+
+---
+
+class: center, middle
+
+![](index_files/figure-html/sp_wasted-1.svg)&lt;!-- --&gt;
+
+---
+
+
+
+
+class: center, middle, inverse
+
+# <i class="fas  fa-wrench "></i> Tools and Method
+
+---
+
+class: center, middle
+
+# <i class="fas  fa-lightbulb "></i> Voronoi Tesselation
+
+---
+
+# Voronoi Tesselation
+
+.middle[
+- Suppose a region `\(S \in \Re^2\)` and a set of `\(n\)` points `\(\big\{Z: z_i = (x_i, y_i)\big\}\)`
+- A Voronoi Tesselation is used to split `\(S\)` in `\(n\)` partitions `\(P_i\)`
+- Each partition is associated with one point in `\(Z\)`
+- Any new point `\(z^*\)` selected inside a partition `\(P_i\)`, will be closer to the point `\(z_i\)` than `\(z_j, \forall j\neq i\)`
+]
+
+---
+
+# Voronoi Tesselation
+
+.center[
+  ![](img/voronoi_ex.gif)
+]
+
+---
+
+class: center, middle
+
+# <i class="fas  fa-lightbulb "></i> Polygons Intersection
+
+---
+
+class: center
+
+![](index_files/figure-html/poly_inter-1.svg)&lt;!-- --&gt;
+
+---
+
+class: center, middle
+
+# Voronoi + Polygon Intersection
+## Getting information from areas
+
+---
+
+.center[
+
+  ![](img/poly_inter2.gif)
+  
+]
+
+---
+
+# Getting information from areas
+
+#### Areas
+`$$C_i: i = 1,...,n$$`
+--
+
+#### Voronoi Cells
+`$$V_j: j = 1, ..., m$$`
+--
+
+#### Area from `\(V_j\)` covered by `\(C_i\)`
+`$$P_{i,j} = \frac{Area(C_i \cap V_j)}{Area(V_j)}$$`
+--
+
+#### Variable observed on `\(C_i\)`
+`$$X_i, n_i$$`
+
+---
+
+# Getting information from areas
+
+#### Counts
+`$${X_j}^* = \sum_i P_{i,j} X_i$$`
+--
+
+#### Averages
+`$${X_j}^* =  \frac{\sum_i P_{i,j} n_i X_i }{\sum_i P_{i,j}n_i}$$`
+
+---
+
+
+class: center, middle, inverse
+
+# <i class="fas  fa-chart-line "></i> Results
+
+---
+
+.center[
+
+![](index_files/figure-html/log_renda-1.svg)&lt;!-- --&gt;
+
+]
+
+&lt;/br&gt;
+
+.footnote[Our method used 99.6% 
+of the total population.]
+
+---
+
+.center[
+
+![](index_files/figure-html/correlation-1.svg)&lt;!-- --&gt;
+
+]
+
+&lt;/br&gt;
+
+.footnote[Correlation: 0.8895.]
+
+---
+
+class: middle
+
+.pull-left[
+
+![](index_files/figure-html/pca-1.svg)&lt;!-- --&gt;
+
+]
+
+.pull-right[
+
+![](index_files/figure-html/pca_2-1.svg)&lt;!-- --&gt;
+
+
+]
+
+---
+
+.center[
+
+![](index_files/figure-html/final_plot-1.svg)&lt;!-- --&gt;
+
+]
+
+---
+
+# Other applications
+
+.middle[
+
+- Verifying the socio-economic profile of the population living in the neighborhood of UBS (basic health units)
+- Given a clients data base with addresses, you can know about them social profile using our method
+
+]
+
+---
+
+
+class: center, middle, inverse
+
+# <i class="fas  fa-check-square "></i> Conclusion
+
+---
+
+# Conclusion
+
+.middle[
+- Our approach seems efficient to aggregate information from areas to points
+- Also can improve the visualization of _geostatistical data_
+- Has several applications  
+]
+
+---
+
+class: center, middle, final
+
+## <i class="fas  fa-globe "></i> lcgodoy.github.io
+
+## <i class="fas  fa-envelope "></i> lucasdac.godoy@gmail.com
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "monokai-sublime",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function() {
+  var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})();</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

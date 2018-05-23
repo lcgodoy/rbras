@@ -1,0 +1,292 @@
+class: center, middle, inverse
+
+# `r icon::fa("chart-line", size = 1)` Results
+
+---
+
+.center[
+
+```{r log_renda}
+load('../data/output_data/ibge_sp.RData')
+
+load('../data/output_data/voronoi_t1_sp.RData')
+
+data %<>%
+  mutate(homens = homens/pop,
+         mulheres = mulheres/pop,
+         brancos = raca_branca/pop,
+         ate_25 = ate_25/pop,
+         de_25_ate_40 = de_25_ate_40/pop,
+         de40_ate_55 = de40_ate_55/pop,
+         maior_55 = maior_55/pop,
+         analf = (1 - analfabetos/pop)) %>% 
+  rename('dens_dom' = 'dens_domiciliar',
+         'renda' = 'renda_media',
+         'de25_ate_40' = 'de_25_ate_40') %>% 
+  select(cod_setor, renda, dens_dom, pop, analf, 
+         brancos, homens, ate_25, de25_ate_40,
+         de40_ate_55, maior_55)
+
+data_aux <- data %>% 
+  mutate(information = 'Census') %>% 
+  rename('ID' = 'cod_setor') %>% 
+  select(ID, information, renda)
+
+vor_aux <- voronoi_t1 %>% 
+  mutate(information = 'Voronois') %>% 
+  select(ID, information, renda)
+
+data_aux <- rbind(data_aux, vor_aux)
+
+rm(vor_aux)
+
+ggplot(data_aux) +
+  geom_sf(aes(fill = log(renda)), size = 0, color = 'transparent') +
+  scale_fill_gradient2(low = 'red', mid = 'white', 
+                        high = 'blue',
+                        midpoint = median(log(data_aux$renda), na.rm = T), 
+                        guide = guide_colorbar(ticks = F, 
+                                               title = 'Avg. Income')) +
+  facet_wrap(~information) +
+  theme_bw() +
+  theme(strip.background = element_rect(fill = 'black', colour = 'white'),
+        axis.text = element_blank(), 
+        strip.text = element_text(color = 'white'),
+        panel.background = element_rect(fill = 'black', color = 'white')) +
+  ylab('log(Avg. Income')
+
+rm(data_aux)
+```
+
+]
+
+</br>
+
+.footnote[Our method used `r scales::percent(sum(voronoi_t1$pop)/sum(data$pop))` 
+of the total population.]
+
+---
+
+.center[
+
+```{r correlation}
+ggplot(voronoi_t1) +
+  geom_point(aes(x = PSDB, y = log(renda)), alpha = .2, shape = 19) +
+  geom_smooth(aes(x = PSDB, y = log(renda)), method = 'lm') + 
+  theme_bw() +
+  labs(xlab = '% votes - PSDB',
+       ylab = '% log(Avg. income)') +
+  theme(strip.background = element_rect(fill = 'transparent'))
+```
+
+]
+
+</br>
+
+.footnote[Correlation: `r formatC(cor(log(voronoi_t1$renda), voronoi_t1$PSDB, use = 'complete.obs'))`.]
+
+---
+
+class: middle
+
+.pull-left[
+
+```{r pca}
+voronoi_test <- voronoi_t1 %>% 
+  as.data.frame() %>% 
+  select(ID,PCB:`BRANCOS/NULOS`) %>% 
+  # mutate_at(.vars = vars(starts_with('P|B')), .funs = funs(winner = colnames(.)[apply(.,1,which.max) %>% unlist]))
+  # mutate(maior_votacao = get_party(.[grep('PCB|PCO', names(.))]))
+  tidyr::gather('partido', 'votos', -ID) %>%
+  group_by(ID) %>%
+  # filter(votos == max(votos))
+  arrange(-ID, -votos) %>%
+  group_by(ID) %>%
+  summarise(partido = first(partido)) %>% 
+  select(ID, partido)
+
+voronoi_t_2 <- voronoi_t1 %>% left_join(voronoi_test, by = 'ID')
+
+rm(voronoi_test)
+
+voronoi_t_2 %>% 
+  as.data.frame() %>%
+  mutate(renda = as.numeric(scale(renda)),
+         dens_dom = as.numeric(scale(dens_dom))) %>% 
+  select(renda:maior_55) %>%
+  select(-pop) %>% 
+  prcomp() -> pca
+
+df <- data.frame(pc1 = pca$x[,1], pc2 = pca$x[,2],
+                 pc3 = pca$x[,3], partido = voronoi_t_2$partido)
+
+labs_pca <- scales::percent(pca$sdev/sum(pca$sdev))
+
+(p1 <- ggplot(df) +
+  geom_point(aes(x = pc1, y = pc2, color = partido), 
+             shape = 19, alpha = .7, size = 2) +
+  theme_bw() +
+  xlab(paste0('PC1', ' ', '(', labs_pca[1], ')')) +
+  ylab(paste0('PC2', ' ', '(', labs_pca[2], ')')) +
+  guides(color = F) +
+  theme(strip.background = element_rect(fill = 'transparent')))
+
+# p2 <- ggplot(df) +
+#   geom_point(aes(x = pc1, y = pc3, color = partido), 
+#              shape = 19, alpha = .7, size = 2) +
+#   theme_bw() +
+#   xlab(paste0('PC1', ' ', '(', labs_pca[1], ')')) +
+#   ylab(paste0('PC3', ' ', '(', labs_pca[3], ')')) +
+#   guides(color = guide_legend(title = NULL)) +
+#   theme(legend.position = 'top', legend.direction = 'horizontal')
+
+# legends <- cowplot::get_legend(p2)
+
+p2 <- ggplot(df) +
+  geom_point(aes(x = pc1, y = pc3, color = partido), 
+             shape = 19, alpha = .7, size = 2) +
+  theme_bw() +
+  xlab(paste0('PC1', ' ', '(', labs_pca[1], ')')) +
+  ylab(paste0('PC3', ' ', '(', labs_pca[3], ')')) +
+  guides(color = F) +
+  theme(strip.background = element_rect(fill = 'transparent'))
+
+# cowplot::plot_grid(p1, p2, ncol = 2, align = 'hv')
+
+# rm(list = ls()[ls() != 'voronoi_t1'])
+```
+
+]
+
+.pull-right[
+
+```{r pca_2}
+
+p2
+
+
+```
+
+
+]
+
+---
+
+.center[
+
+```{r}
+plot_ly(df, x = ~pc1, y = ~pc2, z = ~pc3, color = ~partido,
+             marker = list(size = 2)) %>%
+  add_markers(alpha = .7,
+              hoverinfo = 'partido') %>%
+  layout(scene = list(xaxis = list(title = paste0('PC1', ' ','(', 
+                                                  labs_pca[1], ')'),
+                                   angle = 90),
+                      yaxis = list(title = paste0('PC2', ' ','(', 
+                                                  labs_pca[2], ')'),
+                                   angle = 90),
+                      zaxis = list(title = paste0('PC3', ' ','(', 
+                                                  labs_pca[3], ')'),
+                                   angle = 90)))
+
+rm(list = ls()[ls() != 'voronoi_t1'])
+```
+
+]
+
+---
+
+.center[
+
+```{r final_plot}
+p1 <- ggplot(voronoi_t1) +
+  geom_sf(aes(fill = PT), size = 0, color = 'transparent') +
+  scale_fill_gradient2(low = 'red', mid = 'white', 
+                       high = 'blue',
+                       midpoint = median(voronoi_t1$PT, na.rm = T), 
+                       limits = c(min(voronoi_t1$PT, na.rm = T), 
+                                  max(voronoi_t1$PT, na.rm = T))) +
+  theme_bw() +
+  theme(strip.background = element_rect(fill = 'transparent'),
+        axis.text = element_blank()) +
+  guides(fill = F) +
+  ggtitle('% PT')
+
+p2 <- ggplot(voronoi_t1) +
+  geom_sf(aes(fill = PSB), size = 0, color = 'transparent') +
+  scale_fill_gradient2(low = 'red', mid = 'white', 
+                       high = 'blue',
+                       midpoint = median(voronoi_t1$PSB, na.rm = T), 
+                       limits = c(min(voronoi_t1$PSB, na.rm = T), 
+                                  max(voronoi_t1$PSB, na.rm = T))) +
+  theme_bw() +
+  theme(strip.background = element_rect(fill = 'transparent'),
+        axis.text = element_blank()) +
+  guides(fill = F) +
+  ggtitle('% PSB')
+
+p3 <- ggplot(voronoi_t1) +
+  geom_sf(aes(fill = PSDB), size = 0, color = 'transparent') +
+  scale_fill_gradient2(low = 'red', mid = 'white', 
+                       high = 'blue',
+                       midpoint = median(voronoi_t1$PSDB, na.rm = T), 
+                       limits = c(min(voronoi_t1$PSDB, na.rm = T), 
+                                  max(voronoi_t1$PSDB, na.rm = T))) +
+  theme_bw() +
+  theme(strip.background = element_rect(fill = 'transparent'),
+        axis.text = element_blank()) +
+  guides(fill = F) +
+  ggtitle('% PSDB')
+
+
+p4 <- ggplot(voronoi_t1) +
+  geom_sf(aes(fill = log(renda)), size = 0, color = 'transparent') +
+  scale_fill_gradient2(low = 'red', mid = 'white', 
+                       high = 'blue',
+                       midpoint = log(2*510)) +
+  theme_bw() +
+  theme(strip.background = element_rect(fill = 'transparent'),
+        axis.text = element_blank()) +
+  guides(fill = F) +
+  ggtitle('log(avg. income)')
+
+p5 <- ggplot(voronoi_t1) +
+  geom_sf(aes(fill = brancos), size = 0, color = 'transparent') +
+  scale_fill_gradient2(low = 'red', mid = 'white', 
+                       high = 'blue',
+                       midpoint = .5, limits = c(0, 1)) +
+  theme_bw() +
+  theme(strip.background = element_rect(fill = 'transparent'),
+        axis.text = element_blank()) +
+  guides(fill = F) +
+  ggtitle('% white people')
+
+p6 <- ggplot(voronoi_t1) +
+  geom_sf(aes(fill = analf), size = 0, color = 'transparent') +
+  scale_fill_gradient2(low = 'red', mid = 'white', 
+                       high = 'blue',
+                       midpoint = median(voronoi_t1$analf)) +
+  theme_bw() +
+  theme(strip.background = element_rect(fill = 'transparent'),
+        axis.text = element_blank()) +
+  guides(fill = F) +
+  ggtitle('Illiteracy rate')
+
+cowplot::plot_grid(p1, p2, p3, p4, p5, p6, ncol = 3, 
+                   align = 'hv')
+```
+
+]
+
+---
+
+# Other applications
+
+.middle[
+
+- Verifying the socio-economic profile of the population living in the neighborhood of UBS (basic health units)
+- Given a clients data base with addresses, you can know about them social profile using our method
+
+]
+
+---

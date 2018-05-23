@@ -1,0 +1,121 @@
+class: center, middle, inverse
+
+# `r icon::fa("wrench", size = 1)` Tools and Method
+
+---
+
+class: center, middle
+
+# `r icon::fa("lightbulb", size = 1)` Voronoi Tesselation
+
+---
+
+# Voronoi Tesselation
+
+.middle[
+- Suppose a region $S \in \Re^2$ and a set of $n$ points $\big\{Z: z_i = (x_i, y_i)\big\}$
+- A Voronoi Tesselation is used to split $S$ in $n$ partitions $P_i$
+- Each partition is associated with one point in $Z$
+- Any new point $z^*$ selected inside a partition $P_i$, will be closer to the point $z_i$ than $z_j, \forall j\neq i$
+]
+
+---
+
+# Voronoi Tesselation
+
+.center[
+  ![](img/voronoi_ex.gif)
+]
+
+---
+
+class: center, middle
+
+# `r icon::fa("lightbulb", size = 1)` Polygons Intersection
+
+---
+
+class: center
+
+```{r poly_inter}
+load('../data/output_data/ibge_sp.RData')
+load('../data/output_data/votos_sp.RData')
+load('../data/output_data/voronoi_t1_sp.RData')
+
+#---- Selecting a voronoi cell ----
+
+# index <- sample(1:nrow(voronoi_t1), size = 1)
+
+areas <- st_area(voronoi_t1)
+
+index <- which.max(areas)
+
+vor_example <- voronoi_t1[index,]
+
+#---- Extracting centroid and census sectors that overlap it ----
+
+center_example <- votos %>% 
+  filter(st_within(x = ., y = vor_example, sparse = F))
+
+sect_example <- data %>% 
+  filter(st_intersects(x = ., y = vor_example, sparse = F))
+
+ggplot(sect_example) +
+  geom_sf(data = data, fill = 'transparent', 
+          color = 'black', size = .1) +
+  geom_sf(size = .1, fill = 'gray',
+          color = 'black') +
+  geom_sf(data = vor_example, size = .1,
+          fill = 'steelblue', alpha = .3,
+          color = 'black') +
+  geom_sf(data = center_example,
+          color = 'red', shape = 4) +
+  theme_bw()
+```
+
+---
+
+class: center, middle
+
+# Voronoi + Polygon Intersection
+## Getting information from areas
+
+---
+
+.center[
+
+  ![](img/poly_inter2.gif)
+  
+]
+
+---
+
+# Getting information from areas
+
+#### Areas
+$$C_i: i = 1,...,n$$
+--
+
+#### Voronoi Cells
+$$V_j: j = 1, ..., m$$
+--
+
+#### Area from $V_j$ covered by $C_i$
+$$P_{i,j} = \frac{Area(C_i \cap V_j)}{Area(V_j)}$$
+--
+
+#### Variable observed on $C_i$
+$$X_i, n_i$$
+
+---
+
+# Getting information from areas
+
+#### Counts
+$${X_j}^* = \sum_i P_{i,j} X_i$$
+--
+
+#### Averages
+$${X_j}^* =  \frac{\sum_i P_{i,j} n_i X_i }{\sum_i P_{i,j}n_i}$$
+
+---
