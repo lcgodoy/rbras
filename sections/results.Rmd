@@ -74,9 +74,9 @@ ggplot(voronoi_t1) +
   geom_point(aes(x = PSDB, y = log(renda)), alpha = .2, shape = 19) +
   geom_smooth(aes(x = PSDB, y = log(renda)), method = 'lm') + 
   theme_bw() +
-  labs(xlab = '% votes - PSDB',
-       ylab = '% log(Income)') +
-  theme(strip.background = element_rect(fill = 'transparent'))
+  theme(strip.background = element_rect(fill = 'transparent')) +
+  xlab('% votes - PSDB') +
+  ylab('log(Income)')
 ```
 
 ]

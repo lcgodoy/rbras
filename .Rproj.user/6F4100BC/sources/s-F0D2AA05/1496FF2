@@ -5,15 +5,15 @@
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "3295492070",
+    "hash" : "0",
     "id" : "1496FF2",
-    "lastKnownWriteTime" : 1527129257,
-    "last_content_update" : 1527129257593,
+    "lastKnownWriteTime" : 1527165572,
+    "last_content_update" : 1527165572969,
     "path" : "~/Documents/Projetos/rbras/sections/results.Rmd",
     "project_path" : "sections/results.Rmd",
     "properties" : {
-        "cursorPosition" : "55,19",
-        "scrollLine" : "40"
+        "cursorPosition" : "78,19",
+        "scrollLine" : "65"
     },
     "relative_order" : 2,
     "source_on_save" : false,
