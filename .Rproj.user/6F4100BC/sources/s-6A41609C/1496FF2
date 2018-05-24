@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1527109086500.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3295492070",
+    "id" : "1496FF2",
+    "lastKnownWriteTime" : 1527129257,
+    "last_content_update" : 1527129257593,
+    "path" : "~/Documents/Projetos/rbras/sections/results.Rmd",
+    "project_path" : "sections/results.Rmd",
+    "properties" : {
+        "cursorPosition" : "55,19",
+        "scrollLine" : "40"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

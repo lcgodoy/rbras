@@ -53,7 +53,7 @@ ggplot(data_aux) +
         axis.text = element_blank(), 
         strip.text = element_text(color = 'white'),
         panel.background = element_rect(fill = 'black', color = 'white')) +
-  ylab('log(Avg. Income')
+  ylab('log(Income)')
 
 rm(data_aux)
 ```
@@ -75,7 +75,7 @@ ggplot(voronoi_t1) +
   geom_smooth(aes(x = PSDB, y = log(renda)), method = 'lm') + 
   theme_bw() +
   labs(xlab = '% votes - PSDB',
-       ylab = '% log(Avg. income)') +
+       ylab = '% log(Income)') +
   theme(strip.background = element_rect(fill = 'transparent'))
 ```
 
@@ -164,33 +164,10 @@ p2 <- ggplot(df) +
 
 p2
 
-
-```
-
-
-]
-
----
-
-.center[
-
-```{r}
-plot_ly(df, x = ~pc1, y = ~pc2, z = ~pc3, color = ~partido,
-             marker = list(size = 2)) %>%
-  add_markers(alpha = .7,
-              hoverinfo = 'partido') %>%
-  layout(scene = list(xaxis = list(title = paste0('PC1', ' ','(', 
-                                                  labs_pca[1], ')'),
-                                   angle = 90),
-                      yaxis = list(title = paste0('PC2', ' ','(', 
-                                                  labs_pca[2], ')'),
-                                   angle = 90),
-                      zaxis = list(title = paste0('PC3', ' ','(', 
-                                                  labs_pca[3], ')'),
-                                   angle = 90)))
-
 rm(list = ls()[ls() != 'voronoi_t1'])
+
 ```
+
 
 ]
 
@@ -248,7 +225,7 @@ p4 <- ggplot(voronoi_t1) +
   theme(strip.background = element_rect(fill = 'transparent'),
         axis.text = element_blank()) +
   guides(fill = F) +
-  ggtitle('log(avg. income)')
+  ggtitle('log(Income)')
 
 p5 <- ggplot(voronoi_t1) +
   geom_sf(aes(fill = brancos), size = 0, color = 'transparent') +
@@ -285,7 +262,7 @@ cowplot::plot_grid(p1, p2, p3, p4, p5, p6, ncol = 3,
 .middle[
 
 - Verifying the socio-economic profile of the population living in the neighborhood of UBS (basic health units)
-- Given a clients data base with addresses, you can know about them social profile using our method
+- Given a clients data base with addresses, you can know about the social profile of them using our method
 
 ]
 

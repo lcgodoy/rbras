@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1527124560246.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "6F69050D",
+    "lastKnownWriteTime" : 1527125094,
+    "last_content_update" : 1527125094292,
+    "path" : "~/Documents/Projetos/rbras/sections/method.Rmd",
+    "project_path" : "sections/method.Rmd",
+    "properties" : {
+        "cursorPosition" : "117,0",
+        "scrollLine" : "111"
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

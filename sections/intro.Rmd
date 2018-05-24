@@ -13,7 +13,7 @@ class: venn
 - Data available at [Superior Electoral Court ](http://www.tse.jus.br/)
 --
 
-- Aggregation levels: Country, State, City, Electoral Zone, Electoral Session
+- Aggregation levels: Country, State, City, Electoral Zone, Electoral Section
 
 ![](img/venn.svg)
 
@@ -112,7 +112,7 @@ ggplot(data2) +
           color = 'black', 
           fill = 'transparent',
           alpha = .8) +
-  scale_size_manual(values = c(.2, 1.2)) +
+  scale_size_manual(values = c(.05, .8)) +
   scale_fill_manual(values = c('#adb3bc', 'black')) +
   # scale_fill_gradient(low = '#ffffff', high = '#ff0000', labels = label_pop,
   #                     guide = guide_colorbar(ticks = F, title = 'Population',

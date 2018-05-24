@@ -8,7 +8,7 @@ class: center, middle, inverse
 
 .middle[
 - Our approach seems efficient to aggregate information from areas to points
-- Also can improve the visualization of _geostatistical data_
+- Also can improve the interpretation of _geostatistical data_ for those who are not familiar with that
 - Has several applications  
 ]
 

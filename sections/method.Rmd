@@ -12,19 +12,19 @@ class: center, middle
 
 # Voronoi Tesselation
 
-.middle[
-- Suppose a region $S \in \Re^2$ and a set of $n$ points $\big\{Z: z_i = (x_i, y_i)\big\}$
-- A Voronoi Tesselation is used to split $S$ in $n$ partitions $P_i$
-- Each partition is associated with one point in $Z$
-- Any new point $z^*$ selected inside a partition $P_i$, will be closer to the point $z_i$ than $z_j, \forall j\neq i$
+.center[
+  ![](img/voronoi_ex.gif)
 ]
 
 ---
 
 # Voronoi Tesselation
 
-.center[
-  ![](img/voronoi_ex.gif)
+.middle[
+- Suppose a region $S \in \Re^2$ and a set of $n$ points $\big\{Z: z_i = (x_i, y_i)\big\}$
+- A Voronoi Tesselation is used to split $S$ in $n$ partitions $V_i$
+- Each partition is associated with one point in $Z$
+- Any new point $z^*$ selected inside a partition $V_i$, will be closer to the point $z_i$ than $z_j, \forall j\neq i$
 ]
 
 ---
@@ -92,30 +92,31 @@ class: center, middle
 
 # Getting information from areas
 
-#### Areas
-$$C_i: i = 1,...,n$$
---
 
 #### Voronoi Cells
-$$V_j: j = 1, ..., m$$
+$$V_i: i = 1, ..., m$$
 --
 
-#### Area from $V_j$ covered by $C_i$
-$$P_{i,j} = \frac{Area(C_i \cap V_j)}{Area(V_j)}$$
+#### Areas
+$$C_j: j = 1,...,n$$
 --
 
-#### Variable observed on $C_i$
-$$X_i, n_i$$
+#### Area from $V_i$ covered by $C_j$
+$$P_{i,j} = \frac{Area(V_i \cap C_j)}{Area(V_j)}$$
+--
+
+#### Variable observed on $C_j$
+$$X_j, n_j$$
 
 ---
 
 # Getting information from areas
 
 #### Counts
-$${X_j}^* = \sum_i P_{i,j} X_i$$
+$${X_i}^* = \sum_j P_{i,j} X_j$$
 --
 
 #### Averages
-$${X_j}^* =  \frac{\sum_i P_{i,j} n_i X_i }{\sum_i P_{i,j}n_i}$$
+$${X_i}^* =  \frac{\sum_j P_{i,j} n_j X_j }{\sum_i P_{i,j}n_j}$$
 
 ---

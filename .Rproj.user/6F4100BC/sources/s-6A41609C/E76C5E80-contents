@@ -1,0 +1,22 @@
+class: center, middle, inverse
+
+# `r icon::fa("check-square", size = 1)` Conclusion
+
+---
+
+# Conclusion
+
+.middle[
+- Our approach seems efficient to aggregate information from areas to points
+- Also can improve the interpretation of _geostatistical data_ for those who are not familiar with that
+- Has several applications  
+]
+
+---
+
+class: center, middle, final
+
+## `r icon::fa("globe", size = 1)` lcgodoy.github.io
+
+## `r icon::fa("envelope", size = 1)` lucasdac.godoy@gmail.com
+
